@@ -1,0 +1,10 @@
+[Unit]
+Description=Запуст бэкапа каждые 5 минут
+
+[Timer]
+OnCalendar=*:0/5
+Persistent=true
+Unit=backup.service
+
+[Install]
+WantedBy=timers.target
