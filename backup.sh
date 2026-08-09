@@ -1,5 +1,3 @@
-
-
 #!/bin/sh
 
 mkdir -p /tmp/archiv/backup #создание директории, в которой будут храниться архивные бэкап файлы
@@ -11,15 +9,15 @@ if [ $# -eq 1 ]; then
 		echo "Путь абсолютный"
 		if [[ -d $1 ]]; then
 			echo "Путь указан на каталог."
-			#cp -r $1 /tmp/archiv/backup
-			tar -cf /tmp/archiv/backup/$(date +"%Y-%m-%d-%H-%M-%S".tar) -C $(dirname $1) $(basename $1) #создание архивного бэкап файла
+			DATE=$(date +%Y-%m-%d-%H-%M-%S)
+			tar -cf /tmp/archiv/backup/${DATE}.tar -C $(dirname $1) $(basename $1) #создание архивного бэкап файла
 			if [[ $? -eq 0 ]]; then
 				echo "Архив создан успешно."
 			else
 				echo "Ошибка при создании архива."
 			fi
-			cp /tmp/archiv/backup/$(date +"%Y-%m-%d-%H-%M-%S".tar) /var/ftp/ #копирование архивного бэкап файла на ftp сервер
-
+			lftp -u "ftpuser,Irvingceltics11" ftp://192.168.1.187 -e "cd /upload; put /tmp/archiv/backup/${DATE}.tar; quit"
+			#cp /tmp/archiv/backup/${DATE}.tar /var/ftp/ #копирование архивного бэкап файла на ftp сервер
 		else
 			echo "Путь указан не на каталог. Пожалуйста, укажите путь до каталога, а не до файла."
 		fi
