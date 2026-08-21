@@ -1,0 +1,45 @@
+BEGIN {
+	@processes = 0;
+	@scheduler_switches = 0;
+	@interrupts = 0;
+	@rx_bytes = 0;
+	@tx_bytes = 0;
+	@fs_io_bytes = 0;
+}
+
+tracepoint:sched:sched_process_fork {
+	@processes++;
+}
+
+tracepoint:sched:sched_process_exec {
+	@processes++;
+}
+
+tracepoint:sched:sched_switch {
+	@scheduler_switches++;
+}
+
+tracepoint:irq:irq_handler_entry {
+	@interrupts++;
+}
+
+tracepoint:net:netif_receive_skb {
+	@rx_bytes += (int64)args->len;
+}
+
+tracepoint:net:net_dev_xmit {
+	@tx_bytes += (int64)args->len;
+}
+
+tracepoint:block:block_rq_issue {
+	@fs_io_bytes += (int64)args->bytes;
+}
+
+interval:s:10 {
+	printf("processes %lld\n", @processes);
+	printf("scheduler_switches %lld\n", @scheduler_switches);
+	printf("interrupts %lld\n", @interrupts);
+	printf("rx_bytes %lld\n", @rx_bytes);
+	printf("tx_bytes %lld\n", @tx_bytes);
+	printf("fs_io_bytes %lld\n", @fs_io_bytes);
+}
